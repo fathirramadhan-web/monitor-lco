@@ -20,12 +20,14 @@
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded ml-4">
+                <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded ml-4">
                     Logout
                 </button>
             </form>
         @else
-            <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded">
+            <a href="{{ route('login') }}"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded">
                 Login
             </a>
         @endauth
@@ -43,7 +45,9 @@
         <section>
             <h2 class="text-xl font-semibold mb-3">📅 Detail Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg overflow-x-auto">
-                <canvas id="barChart" height="100"></canvas>
+                <div class="w-full max-w-3xl mx-auto aspect-[2/1]">
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
         </section>
 
@@ -54,7 +58,9 @@
                 <div>
                     <h2 class="text-xl font-semibold mb-3">📈 Daily Progress (Latest)</h2>
                     <div class="bg-white text-black rounded-xl p-6 shadow-lg">
-                        <canvas id="pieChart" height="250"></canvas>
+                        <div class="w-full max-w-md mx-auto aspect-square">
+                            <canvas id="pieChart"></canvas>
+                        </div>
                         <p class="text-xs text-center italic mt-2">*Activation on {{ $dailyProgress['label_date'] }}</p>
                     </div>
                 </div>
@@ -63,7 +69,9 @@
                 <div>
                     <h2 class="text-xl font-semibold mb-3">📦 Product Distribution</h2>
                     <div class="bg-white text-black rounded-xl p-6 shadow-lg">
-                        <canvas id="productChart" height="250"></canvas>
+                        <div class="w-full max-w-md mx-auto aspect-square">
+                            <canvas id="productChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -73,7 +81,9 @@
         <section>
             <h2 class="text-xl font-semibold mb-3">📊 Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg">
-                <canvas id="barHorizontal" height="300"></canvas>
+                <div class="w-full max-w-4xl mx-auto aspect-[3/1]">
+                    <canvas id="barHorizontal"></canvas>
+                </div>
             </div>
         </section>
     </div>
@@ -187,7 +197,8 @@
             type: 'bar',
             data: {
                 labels: {!! json_encode($weeklyReport->pluck('label')) !!},
-                datasets: [{
+                datasets: [
+                    {
                         label: 'Done',
                         data: {!! json_encode($weeklyReport->pluck('done')) !!},
                         backgroundColor: '#60a5fa'

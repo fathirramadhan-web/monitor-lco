@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LCOLog;
 use App\Models\ProductDistribution;
+use Illuminate\Support\Facades\DB; // ✅ Tambahkan ini
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class MonitoringController extends Controller
 {
@@ -15,51 +15,65 @@ class MonitoringController extends Controller
      */
     public function index()
     {
+        // Ambil dan parsing date
         $logs = LCOLog::orderBy('date')->get()->map(function ($item) {
-            $item->date = Carbon::parse($item->date);
+            $item->date = $item->date ? Carbon::parse($item->date) : null;
             return $item;
-        });
+        })->filter(fn($item) => $item->date !== null); // Filter date null
 
-        // 📅 Aktivasi harian
+        // 📅 Aktivasi harian (Bar Chart)
         $barChartData = $logs->groupBy(fn($item) => $item->date->format('Y-m-d'))->map(function ($group) {
+            $date = optional($group->first())->date;
             return [
-                'day' => $group->first()->date->translatedFormat('l'),
-                'date' => $group->first()->date->format('Y-m-d'),
+                'day' => $date ? $date->translatedFormat('l') : '-',
+                'date' => $date ? $date->format('Y-m-d') : '-',
                 'done' => $group->sum('done'),
                 'avg_jam' => $group->avg('jam'),
             ];
         })->values();
 
-        //  Daily progress (terbaru)
+        // 📈 Daily progress (Pie Chart - Tanggal Terbaru)
         $latestDate = $logs->max('date');
         $latestLogs = $logs->filter(fn($item) => $item->date->equalTo($latestDate));
-        $totalDone = $latestLogs->sum('done');
-        $totalTarget = $latestLogs->sum('target');
-        $totalTarget = $totalTarget > 0 ? $totalTarget : 1;
 
-        //  Distribusi produk
+        $dailyDone = $latestLogs->sum('done');
+        $dailyTarget = $latestLogs->sum('target');
+        $dailyRemaining = max($dailyTarget - $dailyDone, 0);
+
+        $dailyProgress = [
+            'done' => $dailyDone,
+            'remaining' => $dailyRemaining,
+            'label_date' => $latestDate ? $latestDate->format('Y-m-d') : '-',
+        ];
+
+        // 🎯 Total Activation (seluruh waktu)
+        $totalDone = $logs->sum('done');
+        $totalTarget = 100;
+
+        // 📦 Distribusi produk
         $productDist = ProductDistribution::select('label', 'jumlah')->get();
 
-        //  Weekly Report
+        // 📊 Weekly Report
         $weeklyReport = $logs->groupBy(function ($item) {
-            $week = $item->date->weekOfMonth;
-            $month = $item->date->translatedFormat('M');
+            $date = optional($item->date);
+            $week = $date?->weekOfMonth ?? 0;
+            $month = $date?->translatedFormat('M') ?? '-';
             return "W{$week} {$month}";
         })->map(function ($group) {
-            $date = $group->first()->date;
+            $date = optional($group->first())->date;
             return [
-                'label' => 'W' . $date->weekOfMonth . ' ' . $date->translatedFormat('M'),
+                'label' => $date ? 'W' . $date->weekOfMonth . ' ' . $date->translatedFormat('M') : 'Unknown',
                 'done' => $group->sum('done'),
                 'not_yet' => $group->sum('target') - $group->sum('done'),
             ];
         })->values();
 
-        //  Rata-rata jam pemasangan
+        // ⏱️ Rata-rata jam pemasangan
         $workingLogs = $logs->groupBy(fn($item) => $item->date->format('Y-m-d'))->map(function ($group) {
-            $date = $group->first()->date;
+            $date = optional($group->first())->date;
             return [
-                'date' => $date->format('Y-m-d'),
-                'day' => $date->translatedFormat('l'),
+                'date' => $date ? $date->format('Y-m-d') : '-',
+                'day' => $date ? $date->translatedFormat('l') : '-',
                 'hours' => $group->sum('jam'),
             ];
         })->values();
@@ -71,7 +85,8 @@ class MonitoringController extends Controller
             'latestDate',
             'productDist',
             'weeklyReport',
-            'workingLogs'
+            'workingLogs',
+            'dailyProgress'
         ));
     }
 
@@ -105,15 +120,16 @@ class MonitoringController extends Controller
             'jam' => $validated['jam'],
         ]);
 
-        // Update distribusi produk 20mb
-        $existing20 = ProductDistribution::firstOrCreate(['label' => '20mb'], ['jumlah' => 0]);
-        $existing20->jumlah += $validated['mb20'];
-        $existing20->save();
+        // Update distribusi produk
+        ProductDistribution::updateOrCreate(
+            ['label' => '20mb'],
+            ['jumlah' => DB::raw("jumlah + {$validated['mb20']}")]
+        );
 
-        // Update distribusi produk 50mb
-        $existing50 = ProductDistribution::firstOrCreate(['label' => '50mb'], ['jumlah' => 0]);
-        $existing50->jumlah += $validated['mb50'];
-        $existing50->save();
+        ProductDistribution::updateOrCreate(
+            ['label' => '50mb'],
+            ['jumlah' => DB::raw("jumlah + {$validated['mb50']}")]
+        );
 
         return redirect()->route('monitoring')->with('success', 'Data berhasil ditambahkan.');
     }

@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-950 text-white min-h-screen py-10 px-4 md:px-10 font-sans">
 
-    <!--  Login / Tambah Data -->
+    <!-- Login / Tambah Data -->
     <div class="flex justify-between items-center max-w-6xl mx-auto mb-6">
         @auth
             <a href="{{ route('monitoring.create') }}" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
@@ -32,7 +32,7 @@
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-3xl md:text-4xl font-extrabold">📊 Monitoring for LCO Live Trial</h1>
-            <p class="text-green-400 mt-2">✅ Total Activation (Latest Day)</p>
+            <p class="text-green-400 mt-2">✅ Total Activation (All Time)</p>
             <p class="text-4xl font-bold mt-1">{{ $totalDone }} / {{ $totalTarget }}</p>
         </div>
 
@@ -44,18 +44,18 @@
             </div>
         </div>
 
-        <!--  Grid -->
+        <!-- Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!--  Daily Progress -->
+            <!-- Daily Progress -->
             <div>
                 <h2 class="text-xl font-semibold mb-3">📈 Daily Progress (Latest)</h2>
                 <div class="bg-white text-black rounded-xl p-6 shadow-lg">
                     <canvas id="pieChart" height="200"></canvas>
-                    <p class="text-xs text-center italic mt-2">*Activation was done on latest schedule</p>
+                    <p class="text-xs text-center italic mt-2">*Activation on {{ $dailyProgress['label_date'] }}</p>
                 </div>
             </div>
 
-            <!--  Product Distribution -->
+            <!-- Product Distribution -->
             <div>
                 <h2 class="text-xl font-semibold mb-3">📦 Product Distribution</h2>
                 <div class="bg-white text-black rounded-xl p-6 shadow-lg">
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <!--  Weekly Report -->
+        <!-- Weekly Report -->
         <div>
             <h2 class="text-xl font-semibold mb-3">📊 Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg">
@@ -73,9 +73,9 @@
         </div>
     </div>
 
-    <!-- Chart.js Script -->
+    <!-- Chart.js Scripts -->
     <script>
-        // Daily Activation (Avg Jam)
+        // Daily Activation (Rata-rata Jam)
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
@@ -121,13 +121,13 @@
             }
         });
 
-        //  Daily Progress Pie Chart
+        // Daily Progress Pie Chart (latest date)
         new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
                 labels: ['Done', 'Remaining'],
                 datasets: [{
-                    data: [{{ $totalDone }}, {{ $totalTarget - $totalDone }}],
+                    data: [{{ $dailyProgress['done'] }}, {{ $dailyProgress['remaining'] }}],
                     backgroundColor: ['#22c55e', '#d1d5db']
                 }]
             },
@@ -163,7 +163,7 @@
             }
         });
 
-        //  Weekly Report
+        // Weekly Report Bar
         new Chart(document.getElementById('barHorizontal'), {
             type: 'bar',
             data: {

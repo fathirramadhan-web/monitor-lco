@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Monitoring LCO</title>
@@ -7,12 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="bg-gray-950 text-white min-h-screen py-10 px-4 md:px-10 font-sans">
 
     <!-- Login / Tambah Data -->
     <div class="flex justify-between items-center max-w-6xl mx-auto mb-6">
         @auth
-            <a href="{{ route('monitoring.create') }}" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
+            <a href="{{ route('monitoring.create') }}"
+                class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
                 + Tambah Data
             </a>
             <form method="POST" action="{{ route('logout') }}">
@@ -28,49 +31,51 @@
         @endauth
     </div>
 
-    <div class="max-w-6xl mx-auto space-y-10">
+    <div class="max-w-6xl mx-auto space-y-12">
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-3xl md:text-4xl font-extrabold">📊 Monitoring for LCO Live Trial</h1>
-            <p class="text-green-400 mt-2">✅ Total Activation</p>
+            <p class="text-green-400 mt-2">✅ Total Activation (All Time)</p>
             <p class="text-4xl font-bold mt-1">{{ $totalDone }} / {{ $totalTarget }}</p>
         </div>
 
-        <!-- Daily Activation Chart -->
-        <div>
+        <!-- Row 1: Daily Activation -->
+        <section>
             <h2 class="text-xl font-semibold mb-3">📅 Detail Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg overflow-x-auto">
-                <canvas id="barChart" height="120"></canvas>
+                <canvas id="barChart" height="100"></canvas>
             </div>
-        </div>
+        </section>
 
-        <!-- Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Daily Progress -->
-            <<div>
-                <h2 class="text-xl font-semibold mb-3">📈 Daily Progress</h2>
-                <div class="bg-white text-black rounded-xl p-6 shadow-lg">
-                    <canvas id="pieChart" height="200"></canvas>
-                    <p class="text-xs text-center italic mt-2">*Activation was done on the same day as scheduled</p>
+        <!-- Row 2: Daily Progress + Product Distribution -->
+        <section>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Daily Progress -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-3">📈 Daily Progress (Latest)</h2>
+                    <div class="bg-white text-black rounded-xl p-6 shadow-lg">
+                        <canvas id="pieChart" height="250"></canvas>
+                        <p class="text-xs text-center italic mt-2">*Activation on {{ $dailyProgress['label_date'] }}</p>
+                    </div>
+                </div>
+
+                <!-- Product Distribution -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-3">📦 Product Distribution</h2>
+                    <div class="bg-white text-black rounded-xl p-6 shadow-lg">
+                        <canvas id="productChart" height="250"></canvas>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Product Distribution -->
-            <div>
-                <h2 class="text-xl font-semibold mb-3">📦 Product Distribution</h2>
-                <div class="bg-white text-black rounded-xl p-6 shadow-lg">
-                    <canvas id="productChart" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Weekly Report -->
-        <div>
+        <!-- Row 3: Weekly Report -->
+        <section>
             <h2 class="text-xl font-semibold mb-3">📊 Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg">
                 <canvas id="barHorizontal" height="300"></canvas>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- Chart.js Scripts -->
@@ -80,7 +85,7 @@
             type: 'bar',
             data: {
                 labels: {!! json_encode(
-                    $barChartData->map(fn($item) => $item['day'] . ', ' . \Carbon\Carbon::parse($item['date'])->format('d M'))
+                    $barChartData->map(fn($item) => $item['day'] . ', ' . \Carbon\Carbon::parse($item['date'])->format('d M')),
                 ) !!},
                 datasets: [{
                     label: 'Rata-rata Jam',
@@ -94,28 +99,38 @@
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { color: '#000' }
+                        labels: {
+                            color: '#000'
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { color: '#000' },
+                        ticks: {
+                            color: '#000'
+                        },
                         title: {
                             display: true,
                             text: 'Rata-rata Jam',
                             color: '#000'
                         },
-                        grid: { color: '#e5e7eb' }
+                        grid: {
+                            color: '#e5e7eb'
+                        }
                     },
                     x: {
-                        ticks: { color: '#000' },
+                        ticks: {
+                            color: '#000'
+                        },
                         title: {
                             display: true,
                             text: 'Hari, Tanggal',
                             color: '#000'
                         },
-                        grid: { color: '#e5e7eb' }
+                        grid: {
+                            color: '#e5e7eb'
+                        }
                     }
                 }
             }
@@ -136,7 +151,9 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#000' }
+                        labels: {
+                            color: '#000'
+                        }
                     }
                 }
             }
@@ -157,7 +174,9 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#000' }
+                        labels: {
+                            color: '#000'
+                        }
                     }
                 }
             }
@@ -168,8 +187,7 @@
             type: 'bar',
             data: {
                 labels: {!! json_encode($weeklyReport->pluck('label')) !!},
-                datasets: [
-                    {
+                datasets: [{
                         label: 'Done',
                         data: {!! json_encode($weeklyReport->pluck('done')) !!},
                         backgroundColor: '#60a5fa'
@@ -187,20 +205,27 @@
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { color: '#000' }
+                        labels: {
+                            color: '#000'
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { color: '#000' }
+                        ticks: {
+                            color: '#000'
+                        }
                     },
                     x: {
-                        ticks: { color: '#000' }
+                        ticks: {
+                            color: '#000'
+                        }
                     }
                 }
             }
         });
     </script>
 </body>
+
 </html>

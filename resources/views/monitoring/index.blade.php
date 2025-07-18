@@ -37,7 +37,7 @@
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-3xl md:text-4xl font-extrabold">📊 Monitoring for LCO Live Trial</h1>
-            <p class="text-green-400 mt-2">✅ Total Activation (All Time)</p>
+            <p class="text-green-400 mt-2">✅ Total Activation </p>
             <p class="text-4xl font-bold mt-1">{{ $totalDone }} / {{ $totalTarget }}</p>
         </div>
 
@@ -56,7 +56,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Daily Progress -->
                 <div>
-                    <h2 class="text-xl font-semibold mb-3">📈 Daily Progress (Latest)</h2>
+                    <h2 class="text-xl font-semibold mb-3">📈 Daily Progress</h2>
                     <div class="bg-white text-black rounded-xl p-6 shadow-lg">
                         <div class="w-full max-w-md mx-auto aspect-square">
                             <canvas id="pieChart"></canvas>

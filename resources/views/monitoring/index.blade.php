@@ -32,13 +32,13 @@
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-3xl md:text-4xl font-extrabold">📊 Monitoring for LCO Live Trial</h1>
-            <p class="text-green-400 mt-2">✅ Total Activation (All Time)</p>
+            <p class="text-green-400 mt-2">✅ Total Activation</p>
             <p class="text-4xl font-bold mt-1">{{ $totalDone }} / {{ $totalTarget }}</p>
         </div>
 
         <!-- Daily Activation Chart -->
         <div>
-            <h2 class="text-xl font-semibold mb-3">📅 Daily Activation</h2>
+            <h2 class="text-xl font-semibold mb-3">📅 Detail Weekly Report (Activation)</h2>
             <div class="bg-white rounded-xl p-6 shadow-lg overflow-x-auto">
                 <canvas id="barChart" height="120"></canvas>
             </div>
@@ -47,11 +47,11 @@
         <!-- Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Daily Progress -->
-            <div>
-                <h2 class="text-xl font-semibold mb-3">📈 Daily Progress (Latest)</h2>
+            <<div>
+                <h2 class="text-xl font-semibold mb-3">📈 Daily Progress</h2>
                 <div class="bg-white text-black rounded-xl p-6 shadow-lg">
                     <canvas id="pieChart" height="200"></canvas>
-                    <p class="text-xs text-center italic mt-2">*Activation on {{ $dailyProgress['label_date'] }}</p>
+                    <p class="text-xs text-center italic mt-2">*Activation was done on the same day as scheduled</p>
                 </div>
             </div>
 
